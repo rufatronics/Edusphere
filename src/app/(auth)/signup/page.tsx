@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { BUK_FACULTIES, BUK_LEVELS } from '@/utils/constants'
+import { motion } from 'framer-motion'
+import { ShieldCheck } from 'lucide-react'
 
 export default function SignUp() {
   const [email, setEmail] = useState('')
@@ -14,11 +16,16 @@ export default function SignUp() {
   const [level, setLevel] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [agreed, setAgreed] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!agreed) {
+      setError('You must agree to the terms and privacy policy')
+      return
+    }
     setLoading(true)
     setError(null)
 
@@ -41,7 +48,6 @@ export default function SignUp() {
     }
 
     if (data.user) {
-      // Create profile record
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
@@ -65,73 +71,125 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-50">
-      <div className="p-8 bg-white shadow-md rounded-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-primary text-center">EduSphere BUK</h1>
-        <h2 className="text-xl font-semibold mb-4 text-center">Create Account</h2>
-        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full p-2 border rounded"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-2 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-2 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <select
-            className="w-full p-2 border rounded"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            required
-          >
-            <option value="">Select Faculty/Department</option>
-            {BUK_FACULTIES.map((fac) => (
-              <option key={fac} value={fac}>{fac}</option>
-            ))}
-          </select>
-          <select
-            className="w-full p-2 border rounded"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            required
-          >
-            <option value="">Select Level</option>
-            {BUK_LEVELS.map((lvl) => (
-              <option key={lvl} value={lvl}>{lvl}</option>
-            ))}
-          </select>
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 selection:bg-emerald-500/30">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 rounded-full blur-[120px]" />
+      </div>
+
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="w-full max-w-xl bg-zinc-950 border border-zinc-900 p-10 rounded-[2.5rem] relative z-10"
+      >
+        <div className="flex justify-center mb-8">
+           <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center">
+              <span className="text-black text-2xl font-black">E</span>
+           </div>
+        </div>
+
+        <h1 className="text-3xl font-black tracking-tighter text-center uppercase mb-2">Student Registry</h1>
+        <p className="text-zinc-500 text-xs font-bold text-center uppercase tracking-widest mb-10">Join 1,000+ BUK Scholars Online</p>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-500 text-xs font-bold mb-6 text-center uppercase tracking-tight">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSignUp} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Full Name</label>
+               <input
+                 type="text"
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                 value={fullName}
+                 onChange={(e) => setFullName(e.target.value)}
+                 required
+                 placeholder="Chidi Ibrahim"
+               />
+            </div>
+            <div>
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Email Address</label>
+               <input
+                 type="email"
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                 value={email}
+                 onChange={(e) => setEmail(e.target.value)}
+                 required
+                 placeholder="name@buk.edu.ng"
+               />
+            </div>
+            <div>
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Security Key</label>
+               <input
+                 type="password"
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                 value={password}
+                 onChange={(e) => setPassword(e.target.value)}
+                 required
+                 placeholder="••••••••"
+               />
+            </div>
+            <div>
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Department</label>
+               <select
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
+                 value={department}
+                 onChange={(e) => setDepartment(e.target.value)}
+                 required
+               >
+                 <option value="" className="bg-zinc-950">Select Faculty</option>
+                 {BUK_FACULTIES.map((fac) => (
+                   <option key={fac} value={fac} className="bg-zinc-950">{fac}</option>
+                 ))}
+               </select>
+            </div>
+            <div>
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Current Level</label>
+               <select
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
+                 value={level}
+                 onChange={(e) => setLevel(e.target.value)}
+                 required
+               >
+                 <option value="">Select Level</option>
+                 {BUK_LEVELS.map((lvl) => (
+                   <option key={lvl} value={lvl}>{lvl}</option>
+                 ))}
+               </select>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 px-1">
+             <input
+               type="checkbox"
+               id="terms"
+               checked={agreed}
+               onChange={(e) => setAgreed(e.target.checked)}
+               className="mt-1 accent-emerald-500"
+             />
+             <label htmlFor="terms" className="text-[10px] font-medium text-zinc-500 leading-relaxed">
+               I agree to the <Link href="/terms" className="text-emerald-400 underline">Terms of Use</Link> and <Link href="/privacy" className="text-emerald-400 underline">Privacy Policy</Link>. I understand that EduSphere BUK is an educational tool and takes no responsibility for exam outcomes or data accuracy.
+             </label>
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-primary text-white p-2 rounded hover:bg-opacity-90 disabled:opacity-50"
+            className="w-full bg-white text-black py-5 rounded-[1.5rem] font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 shadow-lg shadow-white/5 disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Sign Up'}
+            {loading ? 'Creating Profile...' : 'Begin Academic Journey'}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm">
-          Already have an account?{' '}
-          <Link href="/login" className="text-primary hover:underline">
-            Login
+
+        <p className="mt-8 text-center text-xs font-bold text-zinc-600 uppercase tracking-tight">
+          Already a member?{' '}
+          <Link href="/login" className="text-emerald-500 hover:underline">
+            Login Now
           </Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }
