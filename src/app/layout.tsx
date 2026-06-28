@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,29 +11,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "EduSphere BUK | All-in-One Study Ecosystem",
   description: "Designed specifically for Bayero University, Kano students. Access past questions, AI tutor, and study groups.",
-  manifest: "/manifest.json",
-};
-
-export const viewport = {
-  themeColor: "#006633",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className="dark">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white selection:bg-emerald-500/30`}>
         {children}
       </body>
     </html>

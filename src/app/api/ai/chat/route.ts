@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 async function callGroq(messages: any[], systemPrompt: string) {
-  // Using llama-3.3-70b-versatile as requested (avoiding 8b)
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -33,9 +32,14 @@ async function callGemini(messages: any[], systemPrompt: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages, mode } = await req.json()
+  const { messages, mode, context } = await req.json()
 
-  let systemPrompt = "You are EduSphere AI, a helpful academic tutor for students at Bayero University, Kano (BUK). "
+  let systemPrompt = "You are EduSphere AI, a helpful academic tutor for BUK students. "
+
+  if (context) {
+    systemPrompt += `You have access to the following document content: """${context}""". Use this to answer the user's questions. `
+  }
+
   if (mode === 'socratic') systemPrompt += "Use the Socratic method: don't give direct answers. Ask guiding questions. "
   else if (mode === 'simplify') systemPrompt += "Explain like I'm 5. "
 
@@ -44,7 +48,6 @@ export async function POST(req: NextRequest) {
       const data = await callGroq(messages, systemPrompt)
       return NextResponse.json(data.choices[0].message)
     } catch (e) {
-      console.warn('Groq failed, falling back to Gemini')
       const data = await callGemini(messages, systemPrompt)
       return NextResponse.json(data.choices[0].message)
     }
