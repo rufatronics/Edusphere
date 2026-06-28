@@ -19,13 +19,19 @@ export default function Login() {
     setLoading(true)
     setError(null)
 
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (loginError) {
-      setError(loginError.message)
+      if (loginError) {
+        setError(loginError.message)
+        setLoading(false)
+        return
+      }
+    } catch (e: any) {
+      setError(e.message || "Failed to connect to authentication server. Check your connection or configuration.")
       setLoading(false)
       return
     }

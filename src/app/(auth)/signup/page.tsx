@@ -29,45 +29,51 @@ export default function SignUp() {
     setLoading(true)
     setError(null)
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          department,
-          level,
-        },
-      },
-    })
-
-    if (signUpError) {
-      setError(signUpError.message)
-      setLoading(false)
-      return
-    }
-
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: data.user.id,
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
             full_name: fullName,
-            email,
             department,
             level,
           },
-        ])
+        },
+      })
 
-      if (profileError) {
-        setError(profileError.message)
+      if (signUpError) {
+        setError(signUpError.message)
         setLoading(false)
         return
       }
 
-      router.push('/dashboard')
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              full_name: fullName,
+              email,
+              department,
+              level,
+            },
+          ])
+
+        if (profileError) {
+          setError(profileError.message)
+          setLoading(false)
+          return
+        }
+
+        router.push('/dashboard')
+      }
+    } catch (e: any) {
+      setError(e.message || "Registry unreachable. Please verify your credentials or try again later.")
+      setLoading(false)
     }
+
   }
 
   return (

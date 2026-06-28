@@ -22,6 +22,7 @@ import {
 import Link from 'next/link'
 import { usePresence } from '@/hooks/usePresence'
 import { trackActivity } from '@/utils/activity'
+import { Footer } from '@/components/Footer'
 
 export default function Dashboard() {
   const { onlineUsers } = usePresence()
@@ -234,6 +235,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        <Footer />
       </main>
     </div>
   )
