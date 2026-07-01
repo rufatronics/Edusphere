@@ -21,6 +21,13 @@ You must replace the placeholder values in your `.env.local` (or your hosting pr
    - Get an API key from [aistudio.google.com](https://aistudio.google.com).
    - Put it in `GEMINI_API_KEY`.
 
+### **Hugging Face Storage Setup**
+1. **Create Dataset:** Create a public dataset at [huggingface.co/new-dataset](https://huggingface.co/new-dataset).
+2. **Access Token:** Get a **Write** token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+3. **Environment:**
+   - `NEXT_PUBLIC_HF_TOKEN`: Your write token.
+   - `NEXT_PUBLIC_HF_DATASET`: Your dataset path (e.g., `username/dataset-name`).
+
 ---
 
 ## 2. 🗄️ Database Setup (SQL Editor)

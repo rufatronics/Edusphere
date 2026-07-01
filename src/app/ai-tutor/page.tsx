@@ -41,10 +41,22 @@ function AITutorContent() {
 
   useEffect(() => {
     if (resourceId) {
-      supabase.from('resources').select('*').eq('id', resourceId).single().then(({ data }) => {
-        setResource(data)
+      supabase.from('resources').select('*').eq('id', resourceId).single().then(async ({ data }) => {
         if (data) {
-          setMessages([{ role: 'assistant', content: `I've loaded "${data.title}". How can I help you understand this document?` }])
+          setResource(data)
+          setMessages([{ role: 'assistant', content: `I've loaded "${data.title}". Analyzing content...` }])
+
+          // Fetch content from HF if available
+          try {
+            const res = await fetch(data.file_url)
+            if (res.ok) {
+              const text = await res.text()
+              setResource({ ...data, content: text.slice(0, 10000) }) // Limit context size
+              setMessages([{ role: 'assistant', content: `I've analyzed "${data.title}". I'm ready to answer questions about it!` }])
+            }
+          } catch (e) {
+            console.error('Failed to fetch document content', e)
+          }
         }
       })
     }

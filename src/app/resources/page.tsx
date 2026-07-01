@@ -61,35 +61,52 @@ export default function ResourceHub() {
     if (!user) return
 
     const fileExt = file.name.split('.').pop()
-    const fileName = `${Math.random()}.${fileExt}`
-    const filePath = `${user.id}/${fileName}`
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
+    const filePath = `resources/${department || 'General'}/${fileName}`
 
-    const { error: uploadError } = await supabase.storage
-      .from('resources')
-      .upload(filePath, file)
+    try {
+      // 1. Upload to Hugging Face directly via browser
+      const hfResponse = await fetch(
+        `https://huggingface.co/api/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/upload/main/${filePath}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HF_TOKEN}`,
+            'Content-Type': file.type,
+          },
+          body: file,
+        }
+      )
 
-    if (uploadError) {
-      alert('Error: ' + uploadError.message)
+      if (!hfResponse.ok) {
+        const errorData = await hfResponse.json()
+        throw new Error(errorData.message || 'Hugging Face upload failed')
+      }
+
+      // 2. Generate the direct download URL (resolve URL)
+      const publicUrl = `https://huggingface.co/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/resolve/main/${filePath}`
+
+      // 3. Store metadata in Supabase
+      const { error: dbError } = await supabase.from('resources').insert([
+        {
+          uploader_id: user.id,
+          title: file.name,
+          file_url: publicUrl,
+          file_type: fileExt,
+          department: department || 'General',
+          storage_provider: 'huggingface',
+          hf_path: filePath
+        },
+      ])
+
+      if (dbError) throw dbError
+      fetchResources()
+    } catch (err: any) {
+      alert('Upload failed: ' + err.message)
+      console.error(err)
+    } finally {
       setUploading(false)
-      return
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('resources')
-      .getPublicUrl(filePath)
-
-    const { error: dbError } = await supabase.from('resources').insert([
-      {
-        uploader_id: user.id,
-        title: file.name,
-        file_url: publicUrl,
-        file_type: fileExt,
-        department: department || 'General',
-      },
-    ])
-
-    if (!dbError) fetchResources()
-    setUploading(false)
   }
 
   return (
