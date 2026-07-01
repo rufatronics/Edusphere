@@ -22,6 +22,8 @@ CREATE TABLE resources (
   department TEXT,
   file_url TEXT NOT NULL,
   file_type TEXT,
+  storage_provider TEXT DEFAULT 'supabase',
+  hf_path TEXT,
   tags TEXT[],
   views_count INTEGER DEFAULT 0,
   downloads_count INTEGER DEFAULT 0,

@@ -78,9 +78,15 @@ export default function ResourceHub() {
         }
       )
 
+      const hfData = await hfResponse.json()
+
       if (!hfResponse.ok) {
-        const errorData = await hfResponse.json()
-        throw new Error(errorData.message || 'Hugging Face upload failed')
+        throw new Error(hfData.message || hfData.error || 'Hugging Face upload failed')
+      }
+
+      // Verify that we got a commit/path back from HF to be absolutely certain
+      if (!hfData.path && !hfData.url) {
+        throw new Error('Hugging Face accepted the file but did not return a valid path.')
       }
 
       // 2. Generate the direct download URL (resolve URL)
@@ -99,7 +105,19 @@ export default function ResourceHub() {
         },
       ])
 
-      if (dbError) throw dbError
+      if (dbError) {
+        // Best effort: attempt to delete the orphaned file from HF if Supabase fails
+        await fetch(
+          `https://huggingface.co/api/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/delete/main/${filePath}`,
+          {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HF_TOKEN}` }
+          }
+        ).catch(() => console.error('Failed to cleanup orphaned HF file'))
+
+        throw new Error(`Database sync failed: ${dbError.message}. File was removed from storage.`)
+      }
+
       fetchResources()
     } catch (err: any) {
       alert('Upload failed: ' + err.message)
