@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { BUK_FACULTIES, BUK_LEVELS } from '@/utils/constants'
 import { motion } from 'framer-motion'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, Home } from 'lucide-react'
 
 export default function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [department, setDepartment] = useState('')
   const [level, setLevel] = useState('')
@@ -23,9 +24,21 @@ export default function SignUp() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!agreed) {
-      setError('You must agree to the terms and privacy policy')
+      setError('Agreement to terms is mandatory for student registry.')
       return
     }
+    if (password !== confirmPassword) {
+      setError('Security keys do not match. Please verify.')
+      return
+    }
+    if (password.length < 8) {
+      setError('Security key must be at least 8 characters long.')
+      return
+    }
+    if (!email.endsWith('@buk.edu.ng')) {
+      if (!confirm('You are not using a BUK email address. Continue anyway?')) return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -87,6 +100,9 @@ export default function SignUp() {
         animate={{ y: 0, opacity: 1 }}
         className="w-full max-w-xl bg-zinc-950 border border-zinc-900 p-10 rounded-[2.5rem] relative z-10"
       >
+        <Link href="/" className="absolute top-8 left-8 p-2 text-zinc-600 hover:text-white transition-colors">
+           <Home size={20} />
+        </Link>
         <div className="flex justify-center mb-8">
            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center">
               <span className="text-black text-2xl font-black">E</span>
@@ -134,7 +150,18 @@ export default function SignUp() {
                  value={password}
                  onChange={(e) => setPassword(e.target.value)}
                  required
-                 placeholder="••••••••"
+                 placeholder="min. 8 chars"
+               />
+            </div>
+            <div>
+               <label className="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 px-1">Verify Key</label>
+               <input
+                 type="password"
+                 className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                 value={confirmPassword}
+                 onChange={(e) => setConfirmPassword(e.target.value)}
+                 required
+                 placeholder="repeat key"
                />
             </div>
             <div>

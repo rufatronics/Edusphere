@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Home } from 'lucide-react'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -50,6 +51,9 @@ export default function Login() {
         animate={{ y: 0, opacity: 1 }}
         className="w-full max-w-md bg-zinc-950 border border-zinc-900 p-10 rounded-[2.5rem] relative z-10"
       >
+        <Link href="/" className="absolute top-8 left-8 p-2 text-zinc-600 hover:text-white transition-colors">
+           <Home size={20} />
+        </Link>
         <div className="flex justify-center mb-8">
            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center">
               <span className="text-black text-2xl font-black">E</span>
