@@ -62,24 +62,7 @@ export default function SignUp() {
       }
 
       if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              full_name: fullName,
-              email,
-              department,
-              level,
-            },
-          ])
-
-        if (profileError) {
-          setError(profileError.message)
-          setLoading(false)
-          return
-        }
-
+        // Profile is now automatically created via Supabase Database Trigger
         router.push('/dashboard')
       }
     } catch (e: any) {
