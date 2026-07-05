@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { BUK_FACULTIES } from '@/utils/constants'
 import {
@@ -11,112 +11,87 @@ import {
   Eye,
   Filter,
   Bot,
-  ChevronLeft,
+  Sparkles,
   Grid,
   List,
-  Sparkles,
+  ChevronLeft,
   ArrowUpRight
 } from 'lucide-react'
 import Link from 'next/link'
 
+interface Resource {
+  id: string
+  title: string
+  course_code?: string
+  department: string
+  file_url: string
+  file_type?: string
+  views_count: number
+  downloads_count: number
+  created_at: string
+}
+
 export default function ResourceHub() {
-  const [resources, setResources] = useState<any[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [department, setDepartment] = useState('')
-  const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [showMyLibrary, setShowMyLibrary] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
   const supabase = createClient()
+
+  const fetchResources = useCallback(async () => {
+    setLoading(true)
+    try {
+      let query = supabase.from('resources').select('*')
+
+      if (showMyLibrary && user) {
+        query = query.eq('uploader_id', user.id)
+      } else if (department) {
+        query = query.eq('department', department)
+      }
+
+      if (search) {
+        query = query.ilike('title', `%${search}%`)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
+      if (error) throw error
+      setResources(data || [])
+    } catch (err: any) {
+      console.error('Error fetching resources:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase, department, search, showMyLibrary, user])
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+  }, [supabase.auth])
 
   useEffect(() => {
     fetchResources()
-  }, [search, department])
-
-  const fetchResources = async () => {
-    setLoading(true)
-    let query = supabase
-      .from('resources')
-      .select('*, profiles(full_name)')
-      .order('created_at', { ascending: false })
-
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,course_code.ilike.%${search}%`)
-    }
-
-    if (department) {
-      query = query.eq('department', department)
-    }
-
-    const { data, error } = await query
-    if (error) console.error('Error fetching resources:', error)
-    else setResources(data || [])
-    setLoading(false)
-  }
+  }, [fetchResources])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
-    const filePath = `resources/${department || 'General'}/${fileName}`
-
     try {
-      // 1. Upload to Hugging Face directly via browser
-      const hfResponse = await fetch(
-        `https://huggingface.co/api/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/upload/main/${filePath}`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HF_TOKEN}`,
-            'Content-Type': file.type,
-          },
-          body: file,
-        }
-      )
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('department', department)
 
-      const hfData = await hfResponse.json()
+      const res = await fetch('/api/resources/upload', {
+        method: 'POST',
+        body: formData,
+      })
 
-      if (!hfResponse.ok) {
-        throw new Error(hfData.message || hfData.error || 'Hugging Face upload failed')
-      }
-
-      // Verify that we got a commit/path back from HF to be absolutely certain
-      if (!hfData.path && !hfData.url) {
-        throw new Error('Hugging Face accepted the file but did not return a valid path.')
-      }
-
-      // 2. Generate the direct download URL (resolve URL)
-      const publicUrl = `https://huggingface.co/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/resolve/main/${filePath}`
-
-      // 3. Store metadata in Supabase
-      const { error: dbError } = await supabase.from('resources').insert([
-        {
-          uploader_id: user.id,
-          title: file.name,
-          file_url: publicUrl,
-          file_type: fileExt,
-          department: department || 'General',
-          storage_provider: 'huggingface',
-          hf_path: filePath
-        },
-      ])
-
-      if (dbError) {
-        // Best effort: attempt to delete the orphaned file from HF if Supabase fails
-        await fetch(
-          `https://huggingface.co/api/datasets/${process.env.NEXT_PUBLIC_HF_DATASET}/delete/main/${filePath}`,
-          {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${process.env.NEXT_PUBLIC_HF_TOKEN}` }
-          }
-        ).catch(() => console.error('Failed to cleanup orphaned HF file'))
-
-        throw new Error(`Database sync failed: ${dbError.message}. File was removed from storage.`)
-      }
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
 
       fetchResources()
     } catch (err: any) {
@@ -140,7 +115,7 @@ export default function ResourceHub() {
               <div>
                 <h1 className="text-2xl font-black tracking-tighter uppercase">Resource Archive</h1>
                 <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> Verified BUK Database
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> Verified BUK Database
                 </p>
               </div>
             </div>
@@ -172,19 +147,31 @@ export default function ResourceHub() {
           <aside className="space-y-8">
             <div>
               <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                📂 Personal Storage
+              </h3>
+              <button
+                onClick={() => setShowMyLibrary(!showMyLibrary)}
+                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all uppercase tracking-tight ${showMyLibrary ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:bg-zinc-900'}`}
+              >
+                {showMyLibrary ? '✓ Viewing My Library' : 'Open My Library'}
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <Filter size={12} /> Filter by Faculty
               </h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => setDepartment('')}
-                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all uppercase tracking-tight ${department === '' ? 'bg-zinc-100 text-black' : 'text-zinc-500 hover:bg-zinc-900'}`}
+                  onClick={() => { setDepartment(''); setShowMyLibrary(false); }}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all uppercase tracking-tight ${(!department && !showMyLibrary) ? 'bg-zinc-100 text-black' : 'text-zinc-500 hover:bg-zinc-900'}`}
                 >
                   All Departments
                 </button>
                 {BUK_FACULTIES.slice(0, 10).map(fac => (
                   <button
                     key={fac}
-                    onClick={() => setDepartment(fac)}
+                    onClick={() => { setDepartment(fac); setShowMyLibrary(false); }}
                     className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all uppercase tracking-tight ${department === fac ? 'bg-zinc-100 text-black' : 'text-zinc-500 hover:bg-zinc-900'}`}
                   >
                     {fac}
@@ -195,7 +182,7 @@ export default function ResourceHub() {
 
             <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-6">
               <Sparkles className="text-emerald-500 mb-4" size={24} />
-              <h4 className="text-sm font-black mb-2 uppercase">Can't find a doc?</h4>
+              <h4 className="text-sm font-black mb-2 uppercase">Can&apos;t find a doc?</h4>
               <p className="text-[11px] text-zinc-500 font-medium leading-relaxed mb-4">Our AI can generate mock questions if you provide a topic name or syllabus snippet.</p>
               <Link href="/ai-tutor" className="text-[10px] font-black text-emerald-500 uppercase hover:underline flex items-center gap-1">
                 ASK AI TUTOR <ArrowUpRight size={12} />
@@ -251,7 +238,7 @@ export default function ResourceHub() {
                             ASK AI <Bot size={12} />
                           </Link>
                           <a
-                            href={res.file_url}
+                            href={`/api/resources/download/${res.id}`}
                             target="_blank"
                             className="ml-auto text-[10px] font-black text-emerald-500 uppercase flex items-center gap-1 hover:underline"
                           >

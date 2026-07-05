@@ -29,6 +29,7 @@ export default function Dashboard() {
   const router = useRouter()
   const supabase = createClient()
   const [profile, setProfile] = useState<any>(null)
+  const [activity, setActivity] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -47,6 +48,14 @@ export default function Dashboard() {
         .single()
 
       setProfile(data)
+      // Fetch recent activity
+      const { data: resources } = await supabase
+        .from('resources')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      setActivity(resources || [])
       setLoading(false)
     }
     getProfile()
@@ -115,7 +124,7 @@ export default function Dashboard() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-black tracking-tighter">STUDENT DASHBOARD</h1>
-            <p className="text-zinc-500 font-medium">Good day, {profile?.full_name?.split(' ')[0] || 'Scholar'} — Let's hit the books.</p>
+            <p className="text-zinc-500 font-medium">Good day, {profile?.full_name?.split(' ')[0] || 'Scholar'} — Let&apos;s hit the books.</p>
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -202,16 +211,20 @@ export default function Dashboard() {
           <div className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-8">
             <h2 className="text-xl font-black mb-6">ACTIVITY</h2>
             <div className="space-y-6">
-              {[1, 2, 3].map((_, i) => (
+              {activity.length === 0 ? (
+                <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest text-center py-10">No recent activity</p>
+              ) : activity.map((item, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="w-10 h-10 bg-zinc-800 rounded-full flex-shrink-0 flex items-center justify-center text-xs">
-                    {i === 0 ? '📚' : i === 1 ? '🤖' : '💬'}
+                    📚
                   </div>
-                  <div>
-                    <p className="text-sm font-bold">
-                      {i === 0 ? 'Resource Uploaded' : i === 1 ? 'AI Query' : 'New Message'}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold truncate uppercase tracking-tight">
+                      {item.title}
                     </p>
-                    <p className="text-xs text-zinc-500">MTH101 Past Question • 2h ago</p>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase">
+                      Uploaded to {item.department}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -225,7 +238,7 @@ export default function Dashboard() {
           <div className="md:col-span-12 bg-emerald-500 text-black rounded-[2rem] p-10 flex flex-col md:flex-row items-center justify-between overflow-hidden relative">
             <div className="relative z-10">
               <h2 className="text-4xl font-black tracking-tighter mb-4">READY FOR YOUR EXAMS?</h2>
-              <p className="text-emerald-900 font-bold max-w-md mb-8">Let EduSphere AI generate a practice quiz based on your department's latest resources.</p>
+              <p className="text-emerald-900 font-bold max-w-md mb-8">Let EduSphere AI generate a practice quiz based on your department&apos;s latest resources.</p>
               <Link href="/ai-tutor" className="px-8 py-4 bg-black text-white rounded-2xl font-black hover:bg-zinc-800 transition-all active:scale-95 inline-block">
                 GENERATE MOCK QUIZ
               </Link>

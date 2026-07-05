@@ -52,7 +52,7 @@ function AITutorContent() {
             if (res.ok) {
               const text = await res.text()
               setResource({ ...data, content: text.slice(0, 10000) }) // Limit context size
-              setMessages([{ role: 'assistant', content: `I've analyzed "${data.title}". I'm ready to answer questions about it!` }])
+              setMessages([{ role: 'assistant', content: `I&apos;ve analyzed "${data.title}". I'm ready to answer questions about it!` }])
             }
           } catch (e) {
             console.error('Failed to fetch document content', e)

@@ -25,7 +25,7 @@ You must replace the placeholder values in your `.env.local` (or your hosting pr
 1. **Create Dataset:** Create a public dataset at [huggingface.co/new-dataset](https://huggingface.co/new-dataset).
 2. **Access Token:** Get a **Write** token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
 3. **Environment:**
-   - `NEXT_PUBLIC_HF_TOKEN`: Your write token.
+   - `HF_TOKEN`: Your write token (Server-side only for security).
    - `NEXT_PUBLIC_HF_DATASET`: Your dataset path (e.g., `username/dataset-name`).
 
 ---
