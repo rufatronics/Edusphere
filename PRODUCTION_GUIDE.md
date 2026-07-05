@@ -68,7 +68,16 @@ The easiest way to deploy is using **Vercel**:
 
 ---
 
-## 🛠️ Maintenance
+## 🛠️ Maintenance & Troubleshooting
+
+### **Fixing "Email Rate Limit Exceeded"**
+If students see a rate limit error during signup, you must adjust Supabase's default security settings:
+1. **Authentication > Settings > Email Auth**: Toggle **OFF** "Confirm email" (Recommended for faster onboarding).
+2. **Authentication > Settings > Rate Limits**: Increase the **Max 1 hour** signup limit from `3` to `50+`.
+
+---
+
+## 🚀 Final Launch Checklist
 - **RLS Policies:** Always double-check your Supabase RLS policies in production to ensure students can only delete their own resources.
 - **AI Limits:** Monitor your Groq usage. If you hit rate limits, the app will automatically switch to Gemini.
 

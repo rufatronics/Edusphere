@@ -56,7 +56,11 @@ export default function SignUp() {
       })
 
       if (signUpError) {
-        setError(signUpError.message)
+        if (signUpError.message.includes('rate limit exceeded')) {
+          setError('BUK Registry is currently at maximum capacity. Please notify the administrator to increase auth limits or try again in 1 hour.')
+        } else {
+          setError(signUpError.message)
+        }
         setLoading(false)
         return
       }
