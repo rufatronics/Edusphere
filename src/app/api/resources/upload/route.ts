@@ -36,28 +36,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
-    // Upload to Hugging Face
+    // Convert file to base64 for HF Commit API
+    const bytes = await file.arrayBuffer()
+    const base64Content = Buffer.from(bytes).toString('base64')
+
+    // Upload to Hugging Face via Commit API (Upload API is retired)
     const hfResponse = await fetch(
-      `https://huggingface.co/api/datasets/${hfDataset}/upload/main/${filePath}`,
+      `https://huggingface.co/api/datasets/${hfDataset}/commit/main`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${hfToken}`,
+          'Content-Type': 'application/json',
         },
-        body: file,
+        body: JSON.stringify({
+          summary: `Upload resource: ${file.name}`,
+          operations: [
+            {
+              operation: 'add',
+              path: filePath,
+              content: base64Content,
+            }
+          ]
+        }),
       }
     )
 
     const hfData = await hfResponse.json()
 
     if (!hfResponse.ok) {
-      console.error('HF Upload Error:', hfData)
+      console.error('HF Commit API Error:', hfData)
       return NextResponse.json({
         error: 'Hugging Face upload failed',
         debug: hfData
       }, { status: 502 })
     }
 
+    // Generate direct download URL
     const publicUrl = `https://huggingface.co/datasets/${hfDataset}/resolve/main/${filePath}`
 
     // Store metadata in Supabase
@@ -76,10 +91,22 @@ export async function POST(request: Request) {
     if (dbError) {
       // Cleanup HF if DB fails
       await fetch(
-        `https://huggingface.co/api/datasets/${hfDataset}/delete/main/${filePath}`,
+        `https://huggingface.co/api/datasets/${hfDataset}/commit/main`,
         {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${hfToken}` }
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${hfToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            summary: `Cleanup orphaned file: ${filePath}`,
+            operations: [
+              {
+                operation: 'delete',
+                path: filePath
+              }
+            ]
+          })
         }
       ).catch(() => console.error('Failed to cleanup orphaned HF file'))
 
