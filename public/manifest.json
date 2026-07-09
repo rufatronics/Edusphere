@@ -1,16 +1,26 @@
 {
   "name": "EduSphere BUK",
   "short_name": "EduSphere",
-  "description": "All-in-one study ecosystem for BUK students",
+  "description": "The all-in-one digital study ecosystem for Bayero University, Kano students.",
   "start_url": "/dashboard",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#10b981",
   "icons": [
     {
       "src": "/favicon.ico",
       "sizes": "64x64",
-      "type": "image/x-icon"
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/x-icon",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": []
 }

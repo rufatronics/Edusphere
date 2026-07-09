@@ -48,13 +48,16 @@ export async function POST(request: Request) {
       }
     )
 
+    const hfData = await hfResponse.json()
+
     if (!hfResponse.ok) {
-      const errorText = await hfResponse.text()
-      console.error('HF Upload Error:', errorText)
-      return NextResponse.json({ error: 'Hugging Face upload failed' }, { status: 502 })
+      console.error('HF Upload Error:', hfData)
+      return NextResponse.json({
+        error: 'Hugging Face upload failed',
+        debug: hfData
+      }, { status: 502 })
     }
 
-    const hfData = await hfResponse.json()
     const publicUrl = `https://huggingface.co/datasets/${hfDataset}/resolve/main/${filePath}`
 
     // Store metadata in Supabase
@@ -83,7 +86,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: dbError.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, resource })
+    return NextResponse.json({ success: true, resource, hf_debug: hfData })
   } catch (error: any) {
     console.error('Resource Upload API Error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

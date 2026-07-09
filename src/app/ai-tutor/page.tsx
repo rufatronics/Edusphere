@@ -190,7 +190,7 @@ function AITutorContent() {
         </header>
 
         {/* Messages Space */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-4 md:p-12 space-y-8 scrollbar-hide">
           <AnimatePresence initial={false}>
             {messages.map((m, i) => (
               <motion.div
@@ -205,7 +205,7 @@ function AITutorContent() {
                   }`}>
                     {m.role === 'user' ? <User size={20} /> : <Bot size={20} />}
                   </div>
-                  <div className={`p-6 rounded-[2rem] text-sm md:text-base leading-relaxed ${
+                  <div className={`p-4 md:p-6 rounded-2xl md:rounded-[2rem] text-sm md:text-base leading-relaxed ${
                     m.role === 'user'
                       ? 'bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-tr-none'
                       : 'bg-zinc-900/40 text-emerald-50 border border-zinc-800/50 rounded-tl-none backdrop-blur-sm'
@@ -235,12 +235,12 @@ function AITutorContent() {
         </div>
 
         {/* Floating Input Area */}
-        <div className="p-6 md:p-10 border-t border-zinc-900 bg-black/80 backdrop-blur-xl">
+        <div className="p-4 md:p-10 border-t border-zinc-900 bg-black/80 backdrop-blur-xl">
           <div className="max-w-4xl mx-auto relative group">
             <input
               type="text"
               placeholder={mode === 'socratic' ? "Ask me to help you solve something..." : "Ask an academic question..."}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-[2rem] pl-6 pr-20 py-5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-[2rem] pl-6 pr-20 py-3.5 md:py-5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-600"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -248,7 +248,7 @@ function AITutorContent() {
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-full flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-90 disabled:opacity-50 disabled:grayscale"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-full flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-90 disabled:opacity-50 disabled:grayscale"
             >
               <ArrowRight size={24} />
             </button>

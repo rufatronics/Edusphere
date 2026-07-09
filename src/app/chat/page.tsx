@@ -126,7 +126,7 @@ export default function ChatPage() {
             <button
               key={u.id}
               onClick={() => setRecipient(u)}
-              className={`w-full p-6 flex items-center gap-4 hover:bg-zinc-900 transition-colors border-b border-zinc-900/50 text-left ${recipient?.id === u.id ? 'bg-zinc-900 border-r-2 border-r-emerald-500' : ''}`}
+              className={`w-full p-4 md:p-6 flex items-center gap-4 hover:bg-zinc-900 transition-colors border-b border-zinc-900/50 text-left ${recipient?.id === u.id ? 'bg-zinc-900 border-r-2 border-r-emerald-500' : ''}`}
             >
               <div className="relative">
                 <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center font-black border border-zinc-700">
@@ -152,7 +152,7 @@ export default function ChatPage() {
       <main className={`flex-1 flex flex-col bg-black relative ${!recipient ? 'hidden lg:flex' : 'flex'}`}>
         {recipient ? (
           <>
-            <header className="p-4 md:p-6 border-b border-zinc-900 flex justify-between items-center bg-black/50 backdrop-blur-md">
+            <header className="p-3 md:p-6 border-b border-zinc-900 flex justify-between items-center bg-black/50 backdrop-blur-md">
               <div className="flex items-center gap-4">
                 <button onClick={() => setRecipient(null)} className="lg:hidden p-2 text-zinc-500"><ChevronLeft size={20} /></button>
                 <div className="relative">
@@ -177,7 +177,7 @@ export default function ChatPage() {
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
               <div className="flex justify-center mb-8">
                 <div className="bg-zinc-900/50 border border-zinc-800 px-4 py-2 rounded-full text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                   <Shield size={12} className="text-emerald-500" /> End-to-end encrypted • Messages vanish in 1h
@@ -208,7 +208,7 @@ export default function ChatPage() {
               <div ref={scrollRef} className="h-10" />
             </div>
 
-            <div className="p-6 md:p-10 border-t border-zinc-900">
+            <div className="p-4 md:p-10 border-t border-zinc-900">
               <div className="max-w-4xl mx-auto flex gap-4">
                 <input
                   type="text"
@@ -220,7 +220,7 @@ export default function ChatPage() {
                 />
                 <button
                   onClick={sendMessage}
-                  className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-95 flex-shrink-0"
+                  className="w-12 h-12 md:w-14 md:h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-95 flex-shrink-0"
                 >
                   <Send size={20} />
                 </button>

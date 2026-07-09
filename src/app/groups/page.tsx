@@ -29,9 +29,9 @@ export default function StudyGroups() {
   const [isPublic, setIsPublic] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchGroups()
-  }, [])
+
+
+
 
   const fetchGroups = async () => {
     setLoading(true)
@@ -43,6 +43,24 @@ export default function StudyGroups() {
     else setGroups(data || [])
     setLoading(false)
   }
+
+  const joinGroup = async (groupId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from('group_members')
+      .insert([{ group_id: groupId, user_id: user.id }])
+
+    if (error) alert(error.message)
+    else fetchGroups()
+  }
+
+  useEffect(() => {
+    fetchGroups()
+  }, [])
+
+
 
   const createGroup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,17 +92,7 @@ export default function StudyGroups() {
     }
   }
 
-  const joinGroup = async (groupId: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
 
-    const { error } = await supabase
-      .from('group_members')
-      .insert([{ group_id: groupId, user_id: user.id }])
-
-    if (error) alert(error.message)
-    else fetchGroups()
-  }
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30">
@@ -125,11 +133,11 @@ export default function StudyGroups() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-12">
           {/* Left Column: Trending/Stats */}
           <div className="lg:col-span-3 space-y-8">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-8">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-6 md:p-8">
               <TrendingUp className="text-emerald-500 mb-6" size={28} />
               <h3 className="text-sm font-black uppercase mb-4 tracking-tighter">Popular Today</h3>
               <div className="space-y-4">
@@ -142,7 +150,7 @@ export default function StudyGroups() {
               </div>
             </div>
 
-            <div className="bg-emerald-500 text-black rounded-[2rem] p-8">
+            <div className="bg-emerald-500 text-black rounded-[2rem] p-6 md:p-8">
               <Zap size={28} className="mb-4" />
               <h3 className="text-lg font-black uppercase tracking-tighter leading-tight mb-2">Boost Your Prep</h3>
               <p className="text-xs font-bold text-emerald-900 opacity-80 leading-relaxed mb-6">
@@ -164,7 +172,7 @@ export default function StudyGroups() {
                   <motion.div
                     key={group.id}
                     whileHover={{ y: -5 }}
-                    className="bg-zinc-950 border border-zinc-900 p-8 rounded-[2rem] hover:border-emerald-500/30 transition-all flex flex-col group relative overflow-hidden"
+                    className="bg-zinc-950 border border-zinc-900 p-6 md:p-8 rounded-[2rem] hover:border-emerald-500/30 transition-all flex flex-col group relative overflow-hidden"
                   >
                     <div className="flex justify-between items-start mb-6">
                       <div className="w-14 h-14 bg-zinc-900 rounded-2xl flex items-center justify-center text-emerald-500 border border-zinc-800">
@@ -233,7 +241,7 @@ export default function StudyGroups() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 p-10 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+              className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             >
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -284,7 +292,7 @@ export default function StudyGroups() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-white text-black py-5 rounded-[1.5rem] font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 mt-4"
+                  className="w-full bg-white text-black py-4 md:py-5 rounded-[1.5rem] font-black uppercase tracking-widest hover:bg-emerald-400 transition-all active:scale-95 mt-4"
                 >
                   CREATE CIRCLE
                 </button>

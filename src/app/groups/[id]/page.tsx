@@ -27,19 +27,6 @@ export default function GroupChatPage() {
   const supabase = createClient()
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      if (data.user) fetchGroupData()
-    })
-  }, [groupId])
-
-  const fetchGroupData = async () => {
-    const { data: groupData } = await supabase.from('groups').select('*').eq('id', groupId).single()
-    setGroup(groupData)
-    if (groupData) fetchMessages()
-  }
-
   const fetchMessages = async () => {
     const { data } = await supabase
       .from('messages')
@@ -69,6 +56,19 @@ export default function GroupChatPage() {
     return () => { supabase.removeChannel(channel) }
   }
 
+  const fetchGroupData = async () => {
+    const { data: groupData } = await supabase.from('groups').select('*').eq('id', groupId).single()
+    setGroup(groupData)
+    if (groupData) fetchMessages()
+  }
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      if (data.user) fetchGroupData()
+    })
+  }, [groupId])
+
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -91,7 +91,7 @@ export default function GroupChatPage() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
-      <header className="p-4 md:p-6 border-b border-zinc-900 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-10">
+      <header className="p-3 md:p-6 border-b border-zinc-900 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <Link href="/groups" className="p-2 text-zinc-500 hover:text-white transition-colors"><ChevronLeft size={20} /></Link>
           <div className="relative">
@@ -150,7 +150,7 @@ export default function GroupChatPage() {
       </div>
 
       {/* Input */}
-      <div className="p-6 md:p-10 border-t border-zinc-900 bg-black/80 backdrop-blur-xl">
+      <div className="p-4 md:p-10 border-t border-zinc-900 bg-black/80 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto flex gap-4">
           <input
             type="text"
@@ -162,7 +162,7 @@ export default function GroupChatPage() {
           />
           <button
             onClick={sendMessage}
-            className="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-95 flex-shrink-0"
+            className="w-12 h-12 md:w-14 md:h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:bg-emerald-400 transition-all active:scale-95 flex-shrink-0"
           >
             <Send size={20} />
           </button>

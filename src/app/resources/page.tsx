@@ -91,7 +91,7 @@ export default function ResourceHub() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      if (!res.ok) { console.error("HF Debug:", data.debug); throw new Error(data.error || "Upload failed"); } console.log("HF Success Debug:", data.hf_debug);
 
       fetchResources()
     } catch (err: any) {
@@ -106,8 +106,8 @@ export default function ResourceHub() {
     <div className="min-h-screen bg-black text-white">
       {/* Header Area */}
       <div className="border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-3 md:gap-6">
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="p-2 hover:bg-zinc-900 rounded-lg text-zinc-500 transition-colors">
                 <ChevronLeft size={20} />
@@ -131,7 +131,7 @@ export default function ResourceHub() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <label className="bg-emerald-500 text-black px-5 py-2.5 rounded-xl text-sm font-black flex items-center gap-2 hover:bg-emerald-400 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
+              <label className="bg-emerald-500 text-black px-4 md:px-5 py-2 md:py-2.5 rounded-xl text-sm font-black flex items-center gap-2 hover:bg-emerald-400 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
                 <Upload size={18} />
                 <span>{uploading ? 'UPLOADING...' : 'UPLOAD'}</span>
                 <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploading} />
@@ -141,8 +141,8 @@ export default function ResourceHub() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 md:gap-6 md:gap-10">
           {/* Sidebar Filters */}
           <aside className="space-y-8">
             <div>
@@ -214,9 +214,9 @@ export default function ResourceHub() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {resources.map((res) => (
-                  <div key={res.id} className="group bg-zinc-950 border border-zinc-900 p-6 rounded-2xl hover:border-emerald-500/30 transition-all hover:bg-zinc-900/50 relative overflow-hidden">
-                    <div className="flex gap-5 items-start relative z-10">
-                      <div className="w-12 h-12 bg-zinc-900 rounded-xl flex items-center justify-center text-emerald-500 border border-zinc-800 flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <div key={res.id} className="group bg-zinc-950 border border-zinc-900 p-4 md:p-6 rounded-xl md:rounded-2xl hover:border-emerald-500/30 transition-all hover:bg-zinc-900/50 relative overflow-hidden">
+                    <div className="flex gap-3 md:gap-5 items-start relative z-10">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-zinc-900 rounded-xl flex items-center justify-center text-emerald-500 border border-zinc-800 flex-shrink-0 group-hover:scale-110 transition-transform">
                         <FileText size={24} />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -224,7 +224,7 @@ export default function ResourceHub() {
                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-4">
                           {res.course_code || 'GEN101'} • {res.department}
                         </p>
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-4 md:gap-3 md:gap-6">
                           <div className="flex items-center gap-1.5 text-[10px] font-black text-zinc-600">
                              <Eye size={14} /> {res.views_count}
                           </div>

@@ -166,7 +166,7 @@ export default function LandingPage() {
             {[1,2,3,4,5].map(i => <Zap key={i} size={20} fill="currentColor" />)}
           </div>
           <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter leading-tight">
-            "EduSphere isn't just an app; it's the unfair advantage every BUK student deserves in 2026."
+            "EduSphere isn&apos;t just an app; it&apos;s the unfair advantage every BUK student deserves in 2026."
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div className="text-left">

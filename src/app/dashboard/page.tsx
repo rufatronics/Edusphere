@@ -120,7 +120,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-10">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 md:p-10">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-black tracking-tighter">STUDENT DASHBOARD</h1>
@@ -147,7 +147,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2rem] flex items-center gap-5"
+            className="bg-zinc-900/50 border border-zinc-800 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex items-center gap-5"
           >
             <div className="w-14 h-14 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center">
               <Flame size={28} />
@@ -159,7 +159,7 @@ export default function Dashboard() {
           </motion.div>
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2rem] flex items-center gap-5"
+            className="bg-zinc-900/50 border border-zinc-800 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex items-center gap-5"
           >
             <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center">
               <BookOpen size={28} />
@@ -171,7 +171,7 @@ export default function Dashboard() {
           </motion.div>
           <motion.div
             whileHover={{ y: -5 }}
-            className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2rem] flex items-center gap-5"
+            className="bg-zinc-900/50 border border-zinc-800 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex items-center gap-5"
           >
             <div className="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center">
               <Users size={28} />
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Link href={action.href} className="group block bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2rem] h-full hover:border-emerald-500/50 transition-colors">
+                <Link href={action.href} className="group block bg-zinc-900/50 border border-zinc-800 p-4 md:p-6 rounded-2xl md:rounded-[2rem] h-full hover:border-emerald-500/50 transition-colors">
                   <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mb-6`}>
                     {action.icon}
                   </div>
@@ -208,7 +208,7 @@ export default function Dashboard() {
           </div>
 
           {/* Activity Feed */}
-          <div className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-8">
+          <div className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-6 md:p-8">
             <h2 className="text-xl font-black mb-6">ACTIVITY</h2>
             <div className="space-y-6">
               {activity.length === 0 ? (
@@ -235,11 +235,11 @@ export default function Dashboard() {
           </div>
 
           {/* Suggestion / AI Card */}
-          <div className="md:col-span-12 bg-emerald-500 text-black rounded-[2rem] p-10 flex flex-col md:flex-row items-center justify-between overflow-hidden relative">
+          <div className="md:col-span-12 bg-emerald-500 text-black rounded-[2rem] p-6 md:p-10 flex flex-col md:flex-row items-center justify-between overflow-hidden relative">
             <div className="relative z-10">
-              <h2 className="text-4xl font-black tracking-tighter mb-4">READY FOR YOUR EXAMS?</h2>
+              <h2 className="text-2xl md:text-4xl font-black tracking-tighter mb-4">READY FOR YOUR EXAMS?</h2>
               <p className="text-emerald-900 font-bold max-w-md mb-8">Let EduSphere AI generate a practice quiz based on your department&apos;s latest resources.</p>
-              <Link href="/ai-tutor" className="px-8 py-4 bg-black text-white rounded-2xl font-black hover:bg-zinc-800 transition-all active:scale-95 inline-block">
+              <Link href="/ai-tutor" className="px-6 py-3 md:px-8 md:py-4 bg-black text-white rounded-2xl font-black hover:bg-zinc-800 transition-all active:scale-95 inline-block">
                 GENERATE MOCK QUIZ
               </Link>
             </div>

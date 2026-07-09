@@ -29,7 +29,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-white font-black uppercase text-sm mb-4 tracking-tight">3. Real-time Presence</h2>
-            <p>To enable collaboration, your "Online" status is visible to other registered BUK students. You can manage visibility in your dashboard settings.</p>
+            <p>To enable collaboration, your &quot;Online&quot; status is visible to other registered BUK students. You can manage visibility in your dashboard settings.</p>
           </section>
 
           <section>
