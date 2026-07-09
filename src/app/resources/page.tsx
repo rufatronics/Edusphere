@@ -1,5 +1,6 @@
 'use client'
 
+import { MobileNav } from '@/components/MobileNav'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { BUK_FACULTIES } from '@/utils/constants'
@@ -103,7 +104,7 @@ export default function ResourceHub() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white">
       {/* Header Area */}
       <div className="border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
@@ -126,7 +127,7 @@ export default function ResourceHub() {
                 <input
                   type="text"
                   placeholder="Search MTH101, CSC201..."
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 md:py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -259,6 +260,7 @@ export default function ResourceHub() {
           </div>
         </div>
       </div>
+      <MobileNav />
     </div>
   )
 }

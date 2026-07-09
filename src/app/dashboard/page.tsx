@@ -1,5 +1,6 @@
 'use client'
 
+import { MobileNav } from '@/components/MobileNav'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -62,7 +63,7 @@ export default function Dashboard() {
   }, [])
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>
   )
@@ -75,7 +76,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white font-sans flex">
       {/* Sidebar */}
       <aside className="w-64 border-r border-zinc-900 flex flex-col p-6 hidden lg:flex">
         <div className="text-xl font-black tracking-tighter flex items-center gap-2 mb-12">
@@ -250,6 +251,7 @@ export default function Dashboard() {
         </div>
         <Footer />
       </main>
+        <MobileNav />
     </div>
   )
 }

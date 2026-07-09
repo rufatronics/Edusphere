@@ -1,5 +1,6 @@
 'use client'
 
+import { MobileNav } from '@/components/MobileNav'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -101,7 +102,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white flex">
       {/* Sidebar - Contacts */}
       <aside className={`w-full lg:w-96 border-r border-zinc-900 flex flex-col bg-zinc-950 ${recipient ? 'hidden lg:flex' : 'flex'}`}>
         <header className="p-6 border-b border-zinc-900">
@@ -244,6 +245,7 @@ export default function ChatPage() {
           </div>
         )}
       </main>
+        {!recipient && <MobileNav />}
     </div>
   )
 }

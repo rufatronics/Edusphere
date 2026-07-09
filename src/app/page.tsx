@@ -66,7 +66,7 @@ export default function LandingPage() {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8"
+          className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8"
         >
           THE FUTURE OF <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-emerald-400 to-emerald-700">STUDYING</span>
@@ -87,10 +87,10 @@ export default function LandingPage() {
           transition={{ delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
-          <Link href="/signup" className="group px-8 py-4 bg-emerald-500 text-black rounded-2xl text-lg font-black hover:bg-emerald-400 transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+          <Link href="/signup" className="group px-6 py-3.5 md:px-8 md:py-4 bg-emerald-500 text-black rounded-2xl text-base md:text-lg font-black hover:bg-emerald-400 transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
             GET STARTED FREE <ArrowRight className="group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link href="/resources" className="px-8 py-4 border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 rounded-2xl text-lg font-bold transition-all backdrop-blur-sm">
+          <Link href="/resources" className="px-6 py-3.5 md:px-8 md:py-4 border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 rounded-2xl text-base md:text-lg font-bold transition-all backdrop-blur-sm">
             Browse Archive
           </Link>
         </motion.div>
@@ -106,19 +106,19 @@ export default function LandingPage() {
           className="grid grid-cols-1 md:grid-cols-12 gap-4"
         >
           {/* Main Feature - AI */}
-          <motion.div variants={itemVariants} className="md:col-span-8 group relative overflow-hidden bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-10 hover:border-emerald-500/50 transition-colors">
+          <motion.div variants={itemVariants} className="md:col-span-8 group relative overflow-hidden bg-zinc-900/50 border border-zinc-800 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 hover:border-emerald-500/50 transition-colors">
             <div className="relative z-10">
               <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-8">
                 <Bot size={32} />
               </div>
-              <h3 className="text-4xl font-black mb-4">AI TUTOR 2.0</h3>
-              <p className="text-zinc-400 text-lg max-w-md">24/7 Academic assistance. Socratic mode to help you think, and Simplify mode for those "ELI5" moments.</p>
+              <h3 className="text-2xl md:text-4xl font-black mb-4">AI TUTOR 2.0</h3>
+              <p className="text-zinc-400 text-lg max-w-md">24/7 Academic assistance. Socratic mode to help you think, and Simplify mode for those "&quot;ELI5&quot;" moments.</p>
             </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/20 transition-all" />
           </motion.div>
 
           {/* Side Feature - Resource */}
-          <motion.div variants={itemVariants} className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-10 hover:border-emerald-500/50 transition-colors">
+          <motion.div variants={itemVariants} className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 hover:border-emerald-500/50 transition-colors">
             <div className="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-8">
               <BookOpen size={32} />
             </div>
@@ -127,7 +127,7 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Privacy Feature */}
-          <motion.div variants={itemVariants} className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-10 hover:border-emerald-500/50 transition-colors">
+          <motion.div variants={itemVariants} className="md:col-span-4 bg-zinc-900/50 border border-zinc-800 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 hover:border-emerald-500/50 transition-colors">
             <div className="w-14 h-14 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center mb-8">
               <Shield size={32} />
             </div>
@@ -136,12 +136,12 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Study Groups */}
-          <motion.div variants={itemVariants} className="md:col-span-8 bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between gap-8 hover:border-emerald-500/50 transition-colors overflow-hidden relative">
+          <motion.div variants={itemVariants} className="md:col-span-8 bg-zinc-900/50 border border-zinc-800 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 hover:border-emerald-500/50 transition-colors overflow-hidden relative">
             <div>
               <div className="w-14 h-14 bg-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mb-8">
                 <Users size={32} />
               </div>
-              <h3 className="text-4xl font-black mb-4">COLLABORATE</h3>
+              <h3 className="text-2xl md:text-4xl font-black mb-4">COLLABORATE</h3>
               <p className="text-zinc-400 text-lg">Join or create study groups for your specific BUK courses.</p>
             </div>
             <div className="flex -space-x-4">
@@ -166,7 +166,7 @@ export default function LandingPage() {
             {[1,2,3,4,5].map(i => <Zap key={i} size={20} fill="currentColor" />)}
           </div>
           <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter leading-tight">
-            "EduSphere isn&apos;t just an app; it&apos;s the unfair advantage every BUK student deserves in 2026."
+            &quot;EduSphere isn&apos;t just an app; it&apos;s the unfair advantage every BUK student deserves in 2026.&quot;
           </h2>
           <div className="flex items-center justify-center gap-4">
             <div className="text-left">

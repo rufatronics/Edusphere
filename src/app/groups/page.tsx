@@ -1,5 +1,6 @@
 'use client'
 
+import { MobileNav } from '@/components/MobileNav'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -19,9 +20,17 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 
+interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  is_public: boolean;
+  group_members?: { count: number }[];
+}
+
 export default function StudyGroups() {
   const router = useRouter()
-  const [groups, setGroups] = useState<any[]>([])
+  const [groups, setGroups] = useState<Group[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
@@ -95,7 +104,7 @@ export default function StudyGroups() {
 
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30">
+    <div className="min-h-screen pb-20 md:pb-0 bg-black text-white selection:bg-emerald-500/30">
       {/* Header Section */}
       <div className="border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -225,6 +234,7 @@ export default function StudyGroups() {
           </div>
         </div>
       </main>
+        <MobileNav />
 
       {/* Create Modal */}
       <AnimatePresence>
