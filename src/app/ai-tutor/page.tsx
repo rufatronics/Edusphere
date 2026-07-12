@@ -108,10 +108,20 @@ function AITutorContent() {
       })
 
       const data = await res.json()
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          setMessages(prev => [...prev, { role: 'assistant', content: data.message || 'Slow down! Please wait 5 seconds between messages.' }])
+        } else {
+          setMessages(prev => [...prev, { role: 'assistant', content: 'I\'m having trouble connecting to my brain right now. Please try again.' }])
+        }
+        return
+      }
+
       setMessages(prev => [...prev, data])
     } catch (error) {
       console.error('AI Error:', error)
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'I encountered an unexpected error. Check your connection and try again.' }])
     } finally {
       setLoading(false)
     }

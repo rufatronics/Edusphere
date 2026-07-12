@@ -24,6 +24,10 @@ export const metadata = {
   title: "EduSphere BUK | All-in-One Study Ecosystem",
   description: "Designed specifically for Bayero University, Kano students. Access past questions, AI tutor, and study groups.",
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -38,9 +42,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white selection:bg-emerald-500/30`}>
         {children}
       </body>
