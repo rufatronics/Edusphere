@@ -11,9 +11,15 @@ import {
   Clock,
   Check,
   CheckCheck,
-  Info
+  Info,
+  Trash2,
+  UserX,
+  Settings,
+  MoreVertical,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function GroupChatPage() {
   const params = useParams()
@@ -23,7 +29,10 @@ export default function GroupChatPage() {
   const [input, setInput] = useState('')
   const [user, setUser] = useState<any>(null)
   const [group, setGroup] = useState<any>(null)
+  const [members, setMembers] = useState<any[]>([])
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
   const supabase = createClient()
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -37,7 +46,7 @@ export default function GroupChatPage() {
     setMessages(data || [])
     setLoading(false)
 
-    // Subscribe to group messages
+    // Subscribe to group messages and deletions
     const channel = supabase
       .channel(`group:${groupId}`)
       .on('postgres_changes', {
@@ -51,6 +60,14 @@ export default function GroupChatPage() {
            return [...prev, payload.new]
         })
       })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'messages',
+        filter: `group_id=eq.${groupId}`
+      }, (payload) => {
+        setMessages(prev => prev.filter(m => m.id !== payload.old.id))
+      })
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
@@ -59,15 +76,33 @@ export default function GroupChatPage() {
   const fetchGroupData = async () => {
     const { data: groupData } = await supabase.from('groups').select('*').eq('id', groupId).single()
     setGroup(groupData)
-    if (groupData) fetchMessages()
+    if (groupData) {
+      fetchMessages()
+      fetchMembers()
+    }
+  }
+
+  const fetchMembers = async () => {
+    const { data } = await supabase
+      .from('group_members')
+      .select('*, profiles(full_name, department, level)')
+      .eq('group_id', groupId)
+
+    setMembers(data || [])
+
+    const currentUserMember = data?.find(m => m.user_id === user?.id)
+    setIsAdmin(currentUserMember?.role === 'admin')
   }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
-      if (data.user) fetchGroupData()
     })
-  }, [groupId])
+  }, [])
+
+  useEffect(() => {
+    if (user && groupId) fetchGroupData()
+  }, [user, groupId])
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -88,6 +123,25 @@ export default function GroupChatPage() {
     }
   }
 
+  const deleteMessage = async (messageId: string) => {
+    const { error } = await supabase.from('messages').delete().eq('id', messageId)
+    if (error) alert('Failed to delete message: ' + error.message)
+  }
+
+  const removeMember = async (userId: string) => {
+    if (!confirm('Are you sure you want to remove this member?')) return
+    const { error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+    if (error) alert('Failed to remove member: ' + error.message)
+    else fetchMembers()
+  }
+
+  const deleteGroup = async () => {
+    if (!confirm('Are you sure you want to DELETE this group? This cannot be undone.')) return
+    const { error } = await supabase.from('groups').delete().eq('id', groupId)
+    if (error) alert('Failed to delete group: ' + error.message)
+    else router.push('/groups')
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
@@ -105,7 +159,12 @@ export default function GroupChatPage() {
           </div>
         </div>
         <div className="flex gap-4">
-           <button className="p-2 text-zinc-500 hover:text-white"><Info size={20} /></button>
+           <button
+             onClick={() => setShowSettings(!showSettings)}
+             className="p-2 text-zinc-500 hover:text-white"
+           >
+             <Settings size={20} />
+           </button>
         </div>
       </header>
 
@@ -122,18 +181,28 @@ export default function GroupChatPage() {
 
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] md:max-w-[70%] ${m.sender_id === user?.id ? 'items-end' : 'items-start'} flex flex-col`}>
+            <div className={`group relative max-w-[85%] md:max-w-[70%] ${m.sender_id === user?.id ? 'items-end' : 'items-start'} flex flex-col`}>
               {m.sender_id !== user?.id && (
                 <span className="text-[10px] font-black text-zinc-500 uppercase tracking-tighter mb-1 ml-1">
                   {m.profiles?.full_name || 'Student'}
                 </span>
               )}
-              <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
+              <div className={`relative p-4 rounded-2xl text-sm leading-relaxed ${
                 m.sender_id === user?.id
                   ? 'bg-emerald-500 text-black font-medium rounded-tr-none'
                   : 'bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-tl-none'
               }`}>
                 {m.content}
+
+                {/* Delete Message Action */}
+                {(isAdmin || m.sender_id === user?.id) && (
+                  <button
+                    onClick={() => deleteMessage(m.id)}
+                    className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-1.5 mt-2 px-1">
                 <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">
@@ -148,6 +217,76 @@ export default function GroupChatPage() {
         ))}
         <div ref={scrollRef} className="h-10" />
       </div>
+
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSettings(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800 p-6 md:p-10 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+            >
+              <button
+                onClick={() => setShowSettings(false)}
+                className="absolute top-6 right-6 p-2 text-zinc-500 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+
+              <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Circle Info</h2>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Members ({members.length})</h3>
+                  <div className="max-h-60 overflow-y-auto space-y-3 pr-2">
+                    {members.map((m) => (
+                      <div key={m.id} className="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-900 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center font-black text-[10px]">
+                            {m.profiles?.full_name?.[0]}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold">{m.profiles?.full_name}</p>
+                            <p className="text-[9px] text-zinc-500 font-bold uppercase">{m.role}</p>
+                          </div>
+                        </div>
+                        {isAdmin && m.user_id !== user?.id && (
+                          <button
+                            onClick={() => removeMember(m.user_id)}
+                            className="p-2 text-zinc-600 hover:text-red-500 transition-colors"
+                          >
+                            <UserX size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {isAdmin && (
+                  <div className="pt-6 border-t border-zinc-900">
+                    <button
+                      onClick={deleteGroup}
+                      className="w-full flex items-center justify-center gap-2 py-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                    >
+                      <Trash2 size={14} /> DELETE CIRCLE
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Input */}
       <div className="p-4 md:p-10 border-t border-zinc-900 bg-black/80 backdrop-blur-xl">

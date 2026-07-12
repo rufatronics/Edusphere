@@ -1,35 +1,35 @@
 'use client'
 
-import { MobileNav } from '@/components/MobileNav'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   Send,
-  User,
-  Check,
-  CheckCheck,
   Search,
-  ChevronLeft,
-  MoreVertical,
-  Phone,
-  Video,
+  MessageCircle,
   Shield,
   Clock,
-  MessageCircle
+  Check,
+  CheckCheck,
+  ChevronLeft,
+  Phone,
+  Video,
+  MoreVertical,
+  Trash2
 } from 'lucide-react'
 import Link from 'next/link'
+import { MobileNav } from '@/components/MobileNav'
 import { usePresence } from '@/hooks/usePresence'
 
-export default function ChatPage() {
-  const { isUserOnline } = usePresence()
+export default function PersonalChatPage() {
+  const [users, setUsers] = useState<any[]>([])
+  const [recipient, setRecipient] = useState<any>(null)
   const [messages, setMessages] = useState<any[]>([])
   const [input, setInput] = useState('')
   const [user, setUser] = useState<any>(null)
-  const [recipient, setRecipient] = useState<any>(null)
-  const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { isUserOnline } = usePresence()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -44,8 +44,9 @@ export default function ChatPage() {
     if (!user || !recipient) return
     fetchMessages()
 
+    // Subscribe to personal messages and deletions
     const channel = supabase
-      .channel(`chat:${user.id}:${recipient.id}`)
+      .channel(`personal:${user.id}:${recipient.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
@@ -60,6 +61,13 @@ export default function ChatPage() {
             return [...prev, payload.new]
           })
         }
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'messages',
+      }, (payload) => {
+        setMessages(prev => prev.filter(m => m.id !== payload.old.id))
       })
       .subscribe()
 
@@ -91,14 +99,19 @@ export default function ChatPage() {
     const tempInput = input
     setInput('')
 
-    const { data, error } = await supabase.from('messages').insert([
+    const { error } = await supabase.from('messages').insert([
       { sender_id: user.id, receiver_id: recipient.id, content: tempInput }
-    ]).select()
+    ])
 
     if (error) {
       console.error('Error sending message:', error)
       setInput(tempInput)
     }
+  }
+
+  const deleteMessage = async (messageId: string) => {
+    const { error } = await supabase.from('messages').delete().eq('id', messageId)
+    if (error) alert('Failed to delete message: ' + error.message)
   }
 
   return (
@@ -194,6 +207,16 @@ export default function ChatPage() {
                         : 'bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-tl-none'
                     }`}>
                       {m.content}
+
+                      {/* Delete Message Action */}
+                      {m.sender_id === user?.id && (
+                        <button
+                          onClick={() => deleteMessage(m.id)}
+                          className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
                     </div>
                     <div className="flex items-center gap-1.5 mt-2 px-1">
                       <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">
