@@ -13,3 +13,6 @@
  GET /login 200 in 7.0s (next.js: 6.2s, proxy.ts: 167ms, application-code: 713ms)
 ○ Compiling /ai-tutor ...
  GET /ai-tutor 200 in 7.6s (next.js: 6.8s, proxy.ts: 127ms, application-code: 641ms)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 7.1s (next.js: 6.1s, proxy.ts: 306ms, application-code: 611ms)
+ GET /login 200 in 93ms (next.js: 39ms, proxy.ts: 11ms, application-code: 43ms)
